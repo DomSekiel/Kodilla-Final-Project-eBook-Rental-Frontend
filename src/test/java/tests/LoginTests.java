@@ -1,6 +1,7 @@
 package tests;
 
 import base.BaseTest;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pages.LoginPage;
 import utils.ConfigReader;
@@ -10,10 +11,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class LoginTests extends BaseTest {
 
-    @Test
-    void shouldLoginWithValidCredentials() {    // TC #1 Logowanie poprawne
+    private LoginPage loginPage;
 
-        LoginPage loginPage = new LoginPage(driver);
+    @BeforeEach
+    void initPage() {
+        loginPage = new LoginPage(driver);
+    }
+
+    @Test
+    void shouldLoginWithValidCredentials() { // TC #1 Logowanie poprawne
 
         loginPage.login(
                 ConfigReader.getProperty("valid.login"),
@@ -25,35 +31,37 @@ public class LoginTests extends BaseTest {
     }
 
     @Test
-    void shouldNotLoginWithInvalidPassword() {     // TC #2 Logowanie błędne hasło
-
-        LoginPage loginPage = new LoginPage(driver);
+    void shouldNotLoginWithInvalidPassword() { // TC #2 Logowanie błędne hasło
 
         loginPage.login(
                 ConfigReader.getProperty("valid.login"),
                 ConfigReader.getProperty("invalid.password")
         );
 
+        assertThat(loginPage.isTitlesPageDisplayed())
+                .isFalse();
+
         assertThat(loginPage.getErrorMessage())
                 .contains("Login failed");
     }
 
     @Test
-    void shouldNotLoginWithEmptyCredentials() {     // TC #3 Logowanie puste pola
+    void shouldNotLoginWithEmptyCredentials() { // TC #3 Logowanie puste pola
 
-        LoginPage loginPage = new LoginPage(driver);
+        loginPage.login("","");
+                //ConfigReader.getProperty("empty.login"), // do wyjaśnienia z Mentorem
+                //ConfigReader.getProperty("empty.password") // do wyjaśnienia z Mentorem
+        //);
 
-        loginPage.login("", "");
+        assertThat(loginPage.isTitlesPageDisplayed())
+                .isFalse();
 
-        assertThat(
-                loginPage.getErrorMessage()
-        ).isNotEmpty();
+        assertThat(loginPage.getErrorMessage())
+                .isNotEmpty();
     }
 
     @Test
-    void shouldNotLoginAfterMultipleInvalidAttempts() {     // TC #4 Wielokrotne błędne logowanie
-
-        LoginPage loginPage = new LoginPage(driver);
+    void shouldNotLoginAfterMultipleInvalidAttempts() { // TC #4 Wielokrotne błędne logowanie
 
         for (int i = 0; i < 3; i++) {
 
@@ -62,38 +70,38 @@ public class LoginTests extends BaseTest {
                     ConfigReader.getProperty("invalid.password")
             );
 
-            assertThat(
-                    loginPage.getErrorMessage()
-            ).contains("Login failed");
+            assertThat(loginPage.getErrorMessage())
+                    .contains("Login failed");
         }
+
+        assertThat(loginPage.isTitlesPageDisplayed())
+                .isFalse();
     }
 
     @Test
-    void shouldRegisterNewUser() {      // TC #5 Rejestracja użytkownika
+    void shouldRegisterNewUser() { // TC #5 Rejestracja użytkownika
 
-        LoginPage loginPage = new LoginPage(driver);
+        String login =
+                TestDataGenerator.generateLogin() + "@bayern.de";
 
-        String login = TestDataGenerator.generateLogin() + "@bayern.de";
-
-        String password = "bayern123";
+        String password =
+                ConfigReader.getProperty("valid.password");
 
         loginPage.register(
                 login,
                 password
         );
 
-        System.out.println(driver.getCurrentUrl());
-        System.out.println(driver.getPageSource());
-
-        driver.navigate().to(ConfigReader.getProperty("base.url"));
+        driver.navigate().to(
+                ConfigReader.getProperty("base.url")
+        );
 
         loginPage.login(
                 login,
                 password
         );
 
-        assertThat(
-                loginPage.isTitlesPageDisplayed()
-        ).isTrue();
+        assertThat(loginPage.isTitlesPageDisplayed())
+                .isTrue();
     }
 }

@@ -15,14 +15,22 @@ public class ConfigReader {
                              .getClassLoader()
                              .getResourceAsStream("config.properties")) {
 
+            if (input == null) {
+                throw new RuntimeException("config.properties not found");
+            }
+
             properties.load(input);
 
         } catch (IOException e) {
-            throw new RuntimeException("Cannot load config.properties");
+            throw new RuntimeException("Cannot load config.properties",e);
         }
     }
 
     public static String getProperty(String key) {
         return properties.getProperty(key);
+    }
+
+    public static int getIntProperty(String key) {
+        return Integer.parseInt(properties.getProperty(key));
     }
 }

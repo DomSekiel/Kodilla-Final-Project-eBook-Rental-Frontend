@@ -1,29 +1,25 @@
-package com.ebook.smoke;
-
-import base.BaseTest;
-import org.junit.jupiter.api.Test;
-import org.openqa.selenium.By;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-import utils.ConfigReader;
-
-import java.time.Duration;
-
-public class LoginSmokeTest extends BaseTest {
-
-    @Test
-    void shouldOpenLoginPage() {
-
-       WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-       wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("login")));
-
-        driver.findElement(By.id("login"))
-                .sendKeys(ConfigReader.getProperty("valid.login"));
-
-        driver.findElement(By.id("password"))
-                .sendKeys(ConfigReader.getProperty("valid.password"));
-
-        driver.findElement(By.id("login-btn"))
-                .click();
-    }
-}
+//package com.ebook.smoke;
+//
+//import base.BaseTest;
+//import org.junit.jupiter.api.Test;
+//import pages.LoginPage;
+//import utils.ConfigReader;
+//
+//import static org.assertj.core.api.Assertions.assertThat;
+//
+//public class LoginSmokeTest extends BaseTest {
+//
+//    @Test
+//    void shouldOpenLoginPage() {
+//
+//        LoginPage loginPage = new LoginPage(driver);
+//
+//        loginPage.login(
+//                ConfigReader.getProperty("valid.login"),
+//                ConfigReader.getProperty("valid.password")
+//        );
+//
+//        assertThat(loginPage.isTitlesPageDisplayed())
+//                .isTrue();
+//    }
+//}

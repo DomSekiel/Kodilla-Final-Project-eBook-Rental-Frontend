@@ -7,12 +7,20 @@ import org.openqa.selenium.chrome.ChromeOptions;
 
 public class DriverFactory {
 
-    public static WebDriver createDriver() {
+    public static WebDriver createDriver(boolean headless) {
 
         WebDriverManager.chromedriver().setup();
 
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("--start-maximized");
+
+        if (headless) {
+
+            options.addArguments("--headless=new");
+            options.addArguments("--window-size=1920,1080");
+        } else {
+            options.addArguments("--start-maximized");
+        }
+
         options.addArguments("--disable-notifications");
 
         return new ChromeDriver(options);

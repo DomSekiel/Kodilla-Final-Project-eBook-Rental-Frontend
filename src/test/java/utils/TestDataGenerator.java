@@ -10,6 +10,11 @@ public class TestDataGenerator {
         return "TestAuthor_" + System.currentTimeMillis();
     }
 
-    public static String generateLogin() {return "user" + System.currentTimeMillis();
+    public static String generateLogin() {
+        return "user" + System.currentTimeMillis();
+    }
+
+    public static String generateYear() {
+        return "2026";
     }
 }

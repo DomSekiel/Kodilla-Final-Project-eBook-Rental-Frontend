@@ -4,6 +4,7 @@ import base.BaseTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pages.LoginPage;
+import pages.ItemsPage;
 import pages.TitlesPage;
 import utils.ConfigReader;
 import utils.TestDataGenerator;
@@ -11,6 +12,8 @@ import utils.TestDataGenerator;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class TitlesTests extends BaseTest {
+
+    private TitlesPage titlesPage;
 
     @BeforeEach
     void login() {
@@ -21,12 +24,12 @@ public class TitlesTests extends BaseTest {
                 ConfigReader.getProperty("valid.login"),
                 ConfigReader.getProperty("valid.password")
         );
+
+        titlesPage = new TitlesPage(driver);
     }
 
     @Test
-    void shouldDisplayTitlesPage() {        // #6 Wyświetlenie listy tytułów
-
-        TitlesPage titlesPage = new TitlesPage(driver);
+    void shouldDisplayTitlesPage() {     // TC #6 Wyświetlenie listy tytułów
 
         assertThat(
                 titlesPage.isTitlesPageDisplayed()
@@ -34,16 +37,15 @@ public class TitlesTests extends BaseTest {
     }
 
     @Test
-    void shouldAddNewTitle() {      // #7 Dodanie nowego tytułu
+    void shouldAddNewTitle() {       // TC #7 Dodanie nowego tytułu
 
-        TitlesPage titlesPage = new TitlesPage(driver);
-
-        String title = TestDataGenerator.generateTitle();
+        String title =
+                TestDataGenerator.generateTitle();
 
         titlesPage.addTitle(
                 title,
                 TestDataGenerator.generateAuthor(),
-                "2025"
+                TestDataGenerator.generateYear()
         );
 
         assertThat(
@@ -52,9 +54,7 @@ public class TitlesTests extends BaseTest {
     }
 
     @Test
-    void shouldNotAddEmptyTitle() {        // #8 Walidacja pustego formularza
-
-        TitlesPage titlesPage = new TitlesPage(driver);
+    void shouldNotAddEmptyTitle() {      // TC #8 Walidacja pustego formularza
 
         titlesPage.submitEmptyTitleForm();
 
@@ -64,9 +64,7 @@ public class TitlesTests extends BaseTest {
     }
 
     @Test
-    void shouldEditTitle() {        // #9 Edycja tytułu
-
-        TitlesPage titlesPage = new TitlesPage(driver);
+    void shouldEditTitle() {     // TC #9 Edycja tytułu
 
         String oldTitle =
                 TestDataGenerator.generateTitle();
@@ -74,10 +72,11 @@ public class TitlesTests extends BaseTest {
         titlesPage.addTitle(
                 oldTitle,
                 TestDataGenerator.generateAuthor(),
-                "2025"
+                TestDataGenerator.generateYear()
         );
 
-        String newTitle = oldTitle + "_edited";
+        String newTitle =
+                oldTitle + "_edited";
 
         titlesPage.editTitle(
                 oldTitle,
@@ -90,16 +89,15 @@ public class TitlesTests extends BaseTest {
     }
 
     @Test
-    void shouldRemoveTitle() {      // #10 Usunięcie tytułu
+    void shouldRemoveTitle() {      // TC #10 Usunięcie tytułu
 
-        TitlesPage titlesPage = new TitlesPage(driver);
-
-        String title = TestDataGenerator.generateTitle();
+        String title =
+                TestDataGenerator.generateTitle();
 
         titlesPage.addTitle(
                 title,
                 TestDataGenerator.generateAuthor(),
-                "2025"
+                TestDataGenerator.generateYear()
         );
 
         titlesPage.removeTitle(title);
@@ -110,13 +108,18 @@ public class TitlesTests extends BaseTest {
     }
 
     @Test
-    void shouldNavigateToItemsPage() {      // #11 Przejście do listy egzemplarzy
+    void shouldNavigateToItemsPage() {      // TC #11 Przejście do listy egzemplarzy
 
-        TitlesPage titlesPage = new TitlesPage(driver);
+        String title =
+                TestDataGenerator.generateTitle();
 
-        titlesPage.clickShowCopiesForFirstTitle();
+        titlesPage.addTitle(
+                title,
+                TestDataGenerator.generateAuthor(),
+                TestDataGenerator.generateYear()
+        );
 
-        System.out.println(driver.getCurrentUrl());
+        titlesPage.openItemsForTitle(title);
 
         assertThat(
                 titlesPage.isItemsPageDisplayed()
@@ -124,11 +127,7 @@ public class TitlesTests extends BaseTest {
     }
 
     @Test
-    void shouldKeepEmptyFormOpened() {       // #12 Blokada zapisu pustego formularza
-
-        TitlesPage titlesPage = new TitlesPage(driver);
-
-        titlesPage.clickAddNewButton();
+    void shouldKeepEmptyFormOpened() {      // TC #12 Blokada zapisu pustego formularza
 
         titlesPage.submitEmptyTitleForm();
 
@@ -138,7 +137,7 @@ public class TitlesTests extends BaseTest {
     }
 
     @Test
-    void shouldKeepTitleAfterRelogin() {        // #13 Zachowanie tytułu po ponownym zalogowaniu
+    void shouldKeepTitleAfterRelogin() {        // #13.1 Zachowanie tytułu po ponownym zalogowaniu
 
         TitlesPage titlesPage = new TitlesPage(driver);
 
@@ -147,7 +146,7 @@ public class TitlesTests extends BaseTest {
         titlesPage.addTitle(
                 title,
                 TestDataGenerator.generateAuthor(),
-                "2025"
+                TestDataGenerator.generateYear()
         );
 
         driver.navigate().refresh();
@@ -167,7 +166,7 @@ public class TitlesTests extends BaseTest {
     }
 
     @Test
-    void shouldRedirectToLoginAfterRefresh() {      // #13 Przekierowanie do ekranu logowania po odświeżeniu strony
+    void shouldRedirectToLoginAfterRefresh() {      // #13.2 Przekierowanie do ekranu logowania po odświeżeniu strony
 
         driver.navigate().refresh();
 
@@ -177,24 +176,30 @@ public class TitlesTests extends BaseTest {
     }
 
     @Test
-    void shouldNotRemoveTitleWithCopies() {     // #14 Usunięcie tytułu posiadającego egzemplarze
+    void shouldNotRemoveTitleWithCopies() {     // TC #14 Usunięcie tytułu posiadającego egzemplarze
 
-        TitlesPage titlesPage = new TitlesPage(driver);
+        String title = TestDataGenerator.generateTitle();
 
-        titlesPage.clickRemoveTitle(
-                "The Fellowship of the Ring"
+        titlesPage.addTitle(
+                title,
+                TestDataGenerator.generateAuthor(),
+                TestDataGenerator.generateYear()
         );
 
-        assertThat(
-                titlesPage.getErrorMessage()
-        ).contains(
-                "You can't remove titles with copies"
-        );
+        titlesPage.openItemsForTitle(title);
 
-        assertThat(
-                titlesPage.isTitleVisible(
-                        "The Fellowship of the Ring"
-                )
-        ).isTrue();
+        ItemsPage itemsPage = new ItemsPage(driver);
+
+        itemsPage.addItem();
+
+        driver.navigate().back();
+
+        assertThat(titlesPage.isTitlesPageDisplayed())
+                .isTrue();
+
+        titlesPage.clickRemoveTitle(title);
+
+        assertThat(titlesPage.getErrorMessage())
+                .contains("You can't remove titles with copies");
     }
 }

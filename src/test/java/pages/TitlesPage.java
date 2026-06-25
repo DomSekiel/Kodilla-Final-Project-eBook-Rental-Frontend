@@ -3,6 +3,8 @@ package pages;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import utils.ConfigReader;
+
 import java.time.Duration;
 
 public class TitlesPage {
@@ -10,10 +12,8 @@ public class TitlesPage {
     private final WebDriver driver;
     private final WebDriverWait wait;
 
-    public TitlesPage(WebDriver driver) {
-        this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-    }
+    private static final int SHORT_TIMEOUT =
+            ConfigReader.getIntProperty("short.timeout.seconds");
 
     private final By addNewButton = By.id("add-title-button");
     private final By titleInput = By.name("title");
@@ -21,13 +21,54 @@ public class TitlesPage {
     private final By yearInput = By.name("year");
     private final By submitButton = By.name("submit-button");
     private final By errorMessage = By.className("alert__content");
+    private final By loader = By.cssSelector(".fog, .lds-ripple");
+
+    public TitlesPage(WebDriver driver) {
+
+        this.driver = driver;
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(ConfigReader.getIntProperty("timeout.seconds")));
+    }
+
+    private void click(By locator) {
+
+        waitForLoader();
+
+        wait.until(
+                ExpectedConditions.elementToBeClickable(locator)
+        ).click();
+    }
+
+    private void type(By locator, String text) {
+
+        wait.until(
+                ExpectedConditions.visibilityOfElementLocated(locator)
+        ).sendKeys(text);
+    }
+
+    private void waitForLoader() {
+
+        try {
+
+            wait.until(
+                    ExpectedConditions.invisibilityOfElementLocated(loader)
+            );
+
+        } catch (TimeoutException ignored) {
+
+        }
+    }
 
     public boolean isTitlesPageDisplayed() {
 
         try {
 
-            wait.until(
-                    ExpectedConditions.visibilityOfElementLocated(addNewButton)
+            new WebDriverWait(
+                    driver,
+                    Duration.ofSeconds(SHORT_TIMEOUT)
+            ).until(
+                    ExpectedConditions.visibilityOfElementLocated(
+                            addNewButton
+                    )
             );
 
             return true;
@@ -40,67 +81,47 @@ public class TitlesPage {
 
     public void clickAddNewButton() {
 
-        wait.until(
-                ExpectedConditions.visibilityOfElementLocated(addNewButton)
-        );
-
-        ((JavascriptExecutor) driver)
-                .executeScript(
-                        "arguments[0].click();",
-                        driver.findElement(addNewButton)
-                );
+        click(addNewButton);
     }
 
     public void addTitle(String title, String author, String year) {
 
         clickAddNewButton();
 
-        wait.until(ExpectedConditions.visibilityOfElementLocated(titleInput))
-                .sendKeys(title);
+        type(titleInput, title);
+        type(authorInput, author);
+        type(yearInput, year);
 
-        driver.findElement(authorInput)
-                .sendKeys(author);
+        click(submitButton);
 
-        driver.findElement(yearInput)
-                .sendKeys(year);
-
-        driver.findElement(submitButton)
-                .click();
-
-        By titleElement = By.xpath(
-                "//li[contains(.,'" + title + "')]"
-        );
-
-        wait.until(
-                ExpectedConditions.visibilityOfElementLocated(titleElement)
-        );
+        waitForLoader();
     }
 
     public void submitEmptyTitleForm() {
 
         clickAddNewButton();
 
-        wait.until(
-                ExpectedConditions.elementToBeClickable(submitButton)
-        ).click();
+        click(submitButton);
     }
 
     public String getErrorMessage() {
 
         return wait.until(
-                ExpectedConditions.visibilityOfElementLocated(errorMessage)
+                ExpectedConditions.visibilityOfElementLocated(
+                        errorMessage
+                )
         ).getText();
     }
 
     public boolean isTitleVisible(String title) {
 
-        By titleElement = By.xpath(
-                "//li[contains(.,'" + title + "')]"
-        );
+        By titleElement =
+                By.xpath("//li[contains(.,'" + title + "')]");
 
         try {
 
-            wait.until(
+            new WebDriverWait(driver, Duration.ofSeconds(SHORT_TIMEOUT)
+            ).until(
                     ExpectedConditions.visibilityOfElementLocated(titleElement)
             );
 
@@ -114,59 +135,59 @@ public class TitlesPage {
 
     public void editTitle(String oldTitle, String newTitle) {
 
-        By editButton = By.xpath(
-                "//li[contains(.,'" + oldTitle + "')]//button[contains(@class,'edit-btn')]"
-        );
+        By editButton = By.xpath("//li[contains(.,'" + oldTitle + "')]//button[contains(@class,'edit-btn')]");
 
-        wait.until(
-                ExpectedConditions.elementToBeClickable(editButton)
-        ).click();
+        click(editButton);
 
         WebElement titleField =
                 wait.until(
-                        ExpectedConditions.visibilityOfElementLocated(titleInput)
+                        ExpectedConditions.visibilityOfElementLocated(
+                                titleInput
+                        )
                 );
 
-        titleField.sendKeys(Keys.CONTROL + "a");
+        titleField.sendKeys(Keys.chord(Keys.CONTROL, "a"));
         titleField.sendKeys(Keys.DELETE);
         titleField.sendKeys(newTitle);
 
-        wait.until(
-                ExpectedConditions.elementToBeClickable(submitButton)
-        ).click();
+        click(submitButton);
+
+        waitForLoader();
     }
 
     public void removeTitle(String title) {
 
-        By removeButton = By.xpath(
-                "//li[contains(.,'" + title + "')]//button[contains(@class,'remove-btn')]"
-        );
+        By removeButton = By.xpath("//li[contains(.,'" + title + "')]//button[contains(@class,'remove-btn')]");
 
-        wait.until(ExpectedConditions.elementToBeClickable(removeButton))
-                .click();
+        click(removeButton);
 
         wait.until(
                 ExpectedConditions.invisibilityOfElementLocated(
-                        By.xpath("//li[contains(.,'" + title + "')]")
+                        By.xpath(
+                                "//li[contains(.,'" + title + "')]"
+                        )
                 )
         );
     }
 
-    public void clickRemoveTitle (String title) {
+    public void clickRemoveTitle(String title) {
 
         By removeButton = By.xpath("//li[contains(.,'" + title + "')]//button[contains(@class,'remove-btn')]");
 
-        wait.until(
-                ExpectedConditions.elementToBeClickable(removeButton)
-        ).click();
+        click(removeButton);
     }
 
     public boolean isTitleFormDisplayed() {
 
         try {
 
-            wait.until(
-                    ExpectedConditions.visibilityOfElementLocated(titleInput)
+            new WebDriverWait(
+                    driver,
+                    Duration.ofSeconds(SHORT_TIMEOUT)
+            ).until(
+                    ExpectedConditions.visibilityOfElementLocated(
+                            titleInput
+                    )
             );
 
             return true;
@@ -184,11 +205,41 @@ public class TitlesPage {
 
         WebElement link =
                 wait.until(
-                        ExpectedConditions.elementToBeClickable(firstLink)
+                        ExpectedConditions.elementToBeClickable(
+                                firstLink
+                        )
                 );
 
         ((JavascriptExecutor) driver)
-                .executeScript("arguments[0].click();", link);
+                .executeScript(
+                        "arguments[0].click();",
+                        link
+                );
+
+        wait.until(
+                ExpectedConditions.urlContains("/items/")
+        );
+    }
+
+    public void openItemsForTitle(String title) {
+
+        By titleLink =
+                By.xpath(
+                        "//li[contains(.,'" + title + "')]//a[contains(@href,'/items/')]"
+                );
+
+        WebElement link =
+                wait.until(
+                        ExpectedConditions.elementToBeClickable(
+                                titleLink
+                        )
+                );
+
+        ((JavascriptExecutor) driver)
+                .executeScript(
+                        "arguments[0].click();",
+                        link
+                );
 
         wait.until(
                 ExpectedConditions.urlContains("/items/")
@@ -197,6 +248,7 @@ public class TitlesPage {
 
     public boolean isItemsPageDisplayed() {
 
-        return driver.getCurrentUrl().contains("/items/");
+        return driver.getCurrentUrl()
+                .contains("/items/");
     }
 }

@@ -23,7 +23,8 @@ jobs:
 
       - name: Create config.properties
 
-        run:  mkdir -p src/test/resources
+        run:  |
+              mkdir -p src/test/resources
               cat > src/test/resources/config.properties << EOF
               base.url=${{ secrets.BASE_URL }}
               valid.login=${{ secrets.VALID_LOGIN }}

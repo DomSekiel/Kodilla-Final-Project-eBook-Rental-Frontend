@@ -21,5 +21,19 @@ jobs:
       - name: Make Gradle executable
         run: chmod +x gradlew
 
+      - name: Create config.properties
+
+        run:  mkdir -p src/test/resources
+              cat > src/test/resources/config.properties << EOF
+              base.url=${{ secrets.BASE_URL }}
+              valid.login=${{ secrets.VALID_LOGIN }}
+              valid.password=${{ secrets.VALID_PASSWORD }}
+              invalid.password=wrongPassword
+              empty.login=
+              empty.password=
+              timeout.seconds=60
+              short.timeout.seconds=3
+              EOF
+
       - name: Run tests
         run: ./gradlew test

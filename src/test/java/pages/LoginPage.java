@@ -1,6 +1,6 @@
 package pages;
 
-import org.openqa.selenium.By;
+import org.openqa.selenium.*;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -20,7 +20,7 @@ public class LoginPage {
     private final By registerButton = By.id("register-btn");
     private final By errorMessage = By.className("alert__content");
     private final By repeatPasswordInput = By.id("password-repeat");
-    private final By loadingOverlay = By.className("fog");
+    private final By loadingOverlay = By.cssSelector(".fog, .lds-ripple");
     private final By titlesHeader = By.xpath("//h2[contains(text(),'Titles catalog')]");
 
     public LoginPage(WebDriver driver) {
@@ -29,11 +29,30 @@ public class LoginPage {
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(ConfigReader.getIntProperty("timeout.seconds")));
     }
 
+//    private void click(By locator) {
+//
+//        wait.until(
+//                ExpectedConditions.elementToBeClickable(locator)
+//        ).click();
+//    }
+
     private void click(By locator) {
 
-        wait.until(
+        waitForLoaderToDisappear();
+
+        WebElement element = wait.until(
                 ExpectedConditions.elementToBeClickable(locator)
-        ).click();
+        );
+
+        ((JavascriptExecutor) driver)
+                .executeScript("arguments[0].scrollIntoView({block: 'center'});", element);
+
+        waitForLoaderToDisappear();
+
+        ((JavascriptExecutor) driver)
+                .executeScript("arguments[0].click();", element);
+
+        waitForLoaderToDisappear();
     }
 
     private void type(By locator, String text) {
@@ -67,6 +86,8 @@ public class LoginPage {
         type(repeatPasswordInput, password);
 
         click(registerButton);
+
+        waitForLoaderToDisappear();
     }
 
     public void clearLoginForm() {

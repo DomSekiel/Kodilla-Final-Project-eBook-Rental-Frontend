@@ -96,6 +96,8 @@ public class LoginTests extends BaseTest {
                 ConfigReader.getProperty("base.url")
         );
 
+        loginPage = new LoginPage(driver);
+
         loginPage.login(
                 login,
                 password

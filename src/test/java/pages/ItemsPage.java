@@ -1,9 +1,6 @@
 package pages;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -29,7 +26,7 @@ public class ItemsPage {
     private final By editButton = By.cssSelector(".edit-btn");
     private final By removeButton = By.cssSelector(".remove-btn");
     private final By rentsHeader = By.xpath("//h2[contains(text(),'Rents')]");
-    private final By loader = By.cssSelector(".fog");
+    private final By loaderOverlay = By.cssSelector(".fog, .lds-ripple");
     private final By firstItemPurchaseDate = By.cssSelector(".items-list__item:first-child .items-list__item__purchase-date");
 
     public ItemsPage(WebDriver driver) {
@@ -40,27 +37,51 @@ public class ItemsPage {
 
     private void click(By locator) {
 
-        wait.until(
-                ExpectedConditions.elementToBeClickable(locator)
-        ).click();
-    }
+        waitForLoaderToDisappear();
 
-    private void waitForLoader() {
+        WebElement element = wait.until(
+                ExpectedConditions.elementToBeClickable(locator)
+        );
+
+        ((JavascriptExecutor) driver).executeScript(
+                "arguments[0].scrollIntoView({block: 'center'});",
+                element
+        );
+
+        waitForLoaderToDisappear();
 
         try {
 
-            wait.until(
-                    ExpectedConditions.invisibilityOfElementLocated(loader)
+            element.click();
+
+        } catch (ElementClickInterceptedException e) {
+
+            ((JavascriptExecutor) driver).executeScript(
+                    "arguments[0].click();",
+                    element
+            );
+        }
+
+        waitForLoaderToDisappear();
+    }
+
+    private void waitForLoaderToDisappear() {
+        try {
+
+            new WebDriverWait(
+                    driver,
+                    Duration.ofSeconds(SHORT_TIMEOUT)
+            ).until(
+                    ExpectedConditions.invisibilityOfElementLocated(loaderOverlay)
             );
 
         } catch (TimeoutException ignored) {
-
         }
     }
 
     public void addItem() {
 
-        waitForLoader();
+        waitForLoaderToDisappear();
 
         click(addButton);
 
@@ -82,12 +103,12 @@ public class ItemsPage {
 
         click(submitButton);
 
-        waitForLoader();
+        waitForLoaderToDisappear();
     }
 
     public void editFirstItem() {
 
-        waitForLoader();
+        waitForLoaderToDisappear();
 
         click(editButton);
 
@@ -133,12 +154,12 @@ public class ItemsPage {
 
         click(submitButton);
 
-        waitForLoader();
+        waitForLoaderToDisappear();
     }
 
     public void clickShowHistoryForFirstItem() {
 
-        waitForLoader();
+       waitForLoaderToDisappear();
 
         click(showHistoryButton);
 
@@ -149,14 +170,14 @@ public class ItemsPage {
 
     public int getItemsCount() {
 
-        waitForLoader();
+        waitForLoaderToDisappear();
 
         return driver.findElements(items).size();
     }
 
     public String getFirstItemPurchaseDate() {
 
-        waitForLoader();
+        waitForLoaderToDisappear();
 
         return wait.until(
                 ExpectedConditions.visibilityOfElementLocated(
@@ -209,7 +230,7 @@ public class ItemsPage {
 
     public String getLastItemId() {
 
-        waitForLoader();
+        waitForLoaderToDisappear();
 
         List<WebElement> allItems = driver.findElements(items);
 
@@ -221,7 +242,7 @@ public class ItemsPage {
 
     public void removeItemById(String itemId) {
 
-            waitForLoader();
+        waitForLoaderToDisappear();
 
             WebElement item =
                     driver.findElement(By.id(itemId));
@@ -242,7 +263,7 @@ public class ItemsPage {
 
     public boolean isItemVisibleById(String itemId) {
 
-        waitForLoader();
+        waitForLoaderToDisappear();
 
         return driver.findElements(By.id(itemId))
                 .stream()

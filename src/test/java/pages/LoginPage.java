@@ -29,13 +29,6 @@ public class LoginPage {
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(ConfigReader.getIntProperty("timeout.seconds")));
     }
 
-//    private void click(By locator) {
-//
-//        wait.until(
-//                ExpectedConditions.elementToBeClickable(locator)
-//        ).click();
-//    }
-
     private void click(By locator) {
 
         waitForLoaderToDisappear();
@@ -44,22 +37,46 @@ public class LoginPage {
                 ExpectedConditions.elementToBeClickable(locator)
         );
 
-        ((JavascriptExecutor) driver)
-                .executeScript("arguments[0].scrollIntoView({block: 'center'});", element);
+        ((JavascriptExecutor) driver).executeScript(
+                "arguments[0].scrollIntoView({block: 'center'});",
+                element
+        );
 
         waitForLoaderToDisappear();
 
-        ((JavascriptExecutor) driver)
-                .executeScript("arguments[0].click();", element);
+        try {
+            element.click();
+        } catch (ElementClickInterceptedException e) {
+            ((JavascriptExecutor) driver).executeScript(
+                    "arguments[0].click();",
+                    element
+            );
+        }
 
         waitForLoaderToDisappear();
     }
 
     private void type(By locator, String text) {
 
-        wait.until(
+        waitForLoaderToDisappear();
+
+        WebElement element = wait.until(
                 ExpectedConditions.visibilityOfElementLocated(locator)
-        ).sendKeys(text);
+        );
+
+        element.clear();
+        element.sendKeys(text);
+    }
+
+    public void waitForLoaderToDisappear() {
+
+        try {
+
+            wait.until(
+                    ExpectedConditions.invisibilityOfElementLocated(loadingOverlay));
+
+        } catch (TimeoutException ignored) {
+        }
     }
 
     public void login(String login, String password) {
@@ -99,17 +116,6 @@ public class LoginPage {
         wait.until(
                 ExpectedConditions.visibilityOfElementLocated(passwordInput)
         ).clear();
-    }
-
-    public void waitForLoaderToDisappear() {
-
-        try {
-
-            wait.until(
-                    ExpectedConditions.invisibilityOfElementLocated(loadingOverlay));
-
-        } catch (TimeoutException ignored) {
-        }
     }
 
     public String getErrorMessage() {

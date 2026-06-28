@@ -21,7 +21,7 @@ public class TitlesPage {
     private final By yearInput = By.name("year");
     private final By submitButton = By.name("submit-button");
     private final By errorMessage = By.className("alert__content");
-    private final By loader = By.cssSelector(".fog, .lds-ripple");
+    private final By loadingOverlay = By.cssSelector(".fog, .lds-ripple");
 
     public TitlesPage(WebDriver driver) {
 
@@ -29,32 +29,57 @@ public class TitlesPage {
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(ConfigReader.getIntProperty("timeout.seconds")));
     }
 
-    private void click(By locator) {
+private void click(By locator) {
 
-        waitForLoader();
+    waitForLoaderToDisappear();
 
-        wait.until(
-                ExpectedConditions.elementToBeClickable(locator)
-        ).click();
+    WebElement element = wait.until(
+            ExpectedConditions.elementToBeClickable(locator)
+    );
+
+    ((JavascriptExecutor) driver).executeScript(
+            "arguments[0].scrollIntoView({block: 'center'});",
+            element
+    );
+
+    waitForLoaderToDisappear();
+
+    try {
+        element.click();
+    } catch (ElementClickInterceptedException e) {
+        ((JavascriptExecutor) driver).executeScript(
+                "arguments[0].click();",
+                element
+        );
     }
+
+    waitForLoaderToDisappear();
+}
 
     private void type(By locator, String text) {
 
-        wait.until(
+        waitForLoaderToDisappear();
+
+        WebElement element = wait.until(
                 ExpectedConditions.visibilityOfElementLocated(locator)
-        ).sendKeys(text);
+        );
+
+        element.clear();
+        element.sendKeys(text);
     }
 
-    private void waitForLoader() {
+    private void waitForLoaderToDisappear() {
 
         try {
 
-            wait.until(
-                    ExpectedConditions.invisibilityOfElementLocated(loader)
+            new WebDriverWait(
+                    driver,
+                    Duration.ofSeconds(SHORT_TIMEOUT)
+            ).until(
+                    ExpectedConditions.invisibilityOfElementLocated(loadingOverlay)
             );
 
         } catch (TimeoutException ignored) {
-
         }
     }
 
@@ -94,7 +119,7 @@ public class TitlesPage {
 
         click(submitButton);
 
-        waitForLoader();
+        waitForLoaderToDisappear();
     }
 
     public void submitEmptyTitleForm() {
@@ -152,7 +177,7 @@ public class TitlesPage {
 
         click(submitButton);
 
-        waitForLoader();
+        waitForLoaderToDisappear();
     }
 
     public void removeTitle(String title) {
@@ -203,18 +228,7 @@ public class TitlesPage {
         By firstLink =
                 By.cssSelector("a[href*='/items/']");
 
-        WebElement link =
-                wait.until(
-                        ExpectedConditions.elementToBeClickable(
-                                firstLink
-                        )
-                );
-
-        ((JavascriptExecutor) driver)
-                .executeScript(
-                        "arguments[0].click();",
-                        link
-                );
+        click(firstLink);
 
         wait.until(
                 ExpectedConditions.urlContains("/items/")
@@ -228,18 +242,7 @@ public class TitlesPage {
                         "//li[contains(.,'" + title + "')]//a[contains(@href,'/items/')]"
                 );
 
-        WebElement link =
-                wait.until(
-                        ExpectedConditions.elementToBeClickable(
-                                titleLink
-                        )
-                );
-
-        ((JavascriptExecutor) driver)
-                .executeScript(
-                        "arguments[0].click();",
-                        link
-                );
+        click (titleLink);
 
         wait.until(
                 ExpectedConditions.urlContains("/items/")

@@ -20,7 +20,7 @@ public class RentsPage {
     private final By rents = By.cssSelector("li.rents-list__rent");
     private final By customerNames = By.cssSelector(".rents-list__rent__customer-name");
     private final By validationError = By.cssSelector(".alert--error");
-    private final By loader = By.cssSelector(".fog");
+    private final By loadingOverlay = By.cssSelector(".fog, .lds-ripple");
 
     public RentsPage(WebDriver driver) {
 
@@ -30,38 +30,64 @@ public class RentsPage {
 
     private void click(By locator) {
 
-        wait.until(
+        waitForLoaderToDisappear();
+
+        WebElement element = wait.until(
                 ExpectedConditions.elementToBeClickable(locator)
-        ).click();
+        );
+
+        ((JavascriptExecutor) driver).executeScript(
+                "arguments[0].scrollIntoView({block: 'center'});",
+                element
+        );
+
+        waitForLoaderToDisappear();
+
+        try {
+            element.click();
+        } catch (ElementClickInterceptedException e) {
+            ((JavascriptExecutor) driver).executeScript(
+                    "arguments[0].click();",
+                    element
+            );
+        }
+
+        waitForLoaderToDisappear();
     }
 
     private void type(By locator, String text) {
 
-        wait.until(
+        waitForLoaderToDisappear();
+
+        WebElement element = wait.until(
                 ExpectedConditions.visibilityOfElementLocated(locator)
-        ).sendKeys(text);
+        );
+
+        element.clear();
+        element.sendKeys(text);
     }
 
-    private void waitForLoader() {
+    public void waitForLoaderToDisappear() {
 
         try {
+
             wait.until(
-                    ExpectedConditions.invisibilityOfElementLocated(loader)
-            );
+                    ExpectedConditions.invisibilityOfElementLocated(loadingOverlay));
+
         } catch (TimeoutException ignored) {
         }
     }
 
     public int getRentsCount() {
 
-        waitForLoader();
+        waitForLoaderToDisappear();
 
         return driver.findElements(rents).size();
     }
 
     public void addRent(String customerName) {
 
-        waitForLoader();
+        waitForLoaderToDisappear();
 
         click(addRentButton);
 
@@ -69,12 +95,12 @@ public class RentsPage {
 
         click(submitButton);
 
-        waitForLoader();
+        waitForLoaderToDisappear();
     }
 
     public void openAddRentForm() {
 
-        waitForLoader();
+        waitForLoaderToDisappear();
 
         click(addRentButton);
     }
@@ -93,7 +119,7 @@ public class RentsPage {
 
     public String getFirstCustomerName() {
 
-        waitForLoader();
+        waitForLoaderToDisappear();
 
         return driver.findElements(customerNames)
                 .get(0)
@@ -102,7 +128,7 @@ public class RentsPage {
 
     public void editFirstRent(String newCustomerName) {
 
-        waitForLoader();
+        waitForLoaderToDisappear();
 
                 click(editButton);
 
@@ -115,15 +141,15 @@ public class RentsPage {
 
                 click(submitButton);
 
-        waitForLoader();
+        waitForLoaderToDisappear();
     }
 
     public void removeFirstRent() {
 
-        waitForLoader();
+        waitForLoaderToDisappear();
 
                 click(removeButton);
 
-        waitForLoader();
+        waitForLoaderToDisappear();
     }
 }

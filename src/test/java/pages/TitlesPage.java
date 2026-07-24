@@ -1,5 +1,6 @@
 package pages;
 
+import base.BasePage;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -7,10 +8,7 @@ import utils.ConfigReader;
 
 import java.time.Duration;
 
-public class TitlesPage {
-
-    private final WebDriver driver;
-    private final WebDriverWait wait;
+public class TitlesPage extends BasePage {
 
     private static final int SHORT_TIMEOUT =
             ConfigReader.getIntProperty("short.timeout.seconds");
@@ -21,66 +19,10 @@ public class TitlesPage {
     private final By yearInput = By.name("year");
     private final By submitButton = By.name("submit-button");
     private final By errorMessage = By.className("alert__content");
-    private final By loadingOverlay = By.cssSelector(".fog, .lds-ripple");
 
     public TitlesPage(WebDriver driver) {
 
-        this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(ConfigReader.getIntProperty("timeout.seconds")));
-    }
-
-private void click(By locator) {
-
-    waitForLoaderToDisappear();
-
-    WebElement element = wait.until(
-            ExpectedConditions.elementToBeClickable(locator)
-    );
-
-    ((JavascriptExecutor) driver).executeScript(
-            "arguments[0].scrollIntoView({block: 'center'});",
-            element
-    );
-
-    waitForLoaderToDisappear();
-
-    try {
-        element.click();
-    } catch (ElementClickInterceptedException e) {
-        ((JavascriptExecutor) driver).executeScript(
-                "arguments[0].click();",
-                element
-        );
-    }
-
-    waitForLoaderToDisappear();
-}
-
-    private void type(By locator, String text) {
-
-        waitForLoaderToDisappear();
-
-        WebElement element = wait.until(
-                ExpectedConditions.visibilityOfElementLocated(locator)
-        );
-
-        element.clear();
-        element.sendKeys(text);
-    }
-
-    private void waitForLoaderToDisappear() {
-
-        try {
-
-            new WebDriverWait(
-                    driver,
-                    Duration.ofSeconds(SHORT_TIMEOUT)
-            ).until(
-                    ExpectedConditions.invisibilityOfElementLocated(loadingOverlay)
-            );
-
-        } catch (TimeoutException ignored) {
-        }
+        super(driver);
     }
 
     public boolean isTitlesPageDisplayed() {
@@ -242,7 +184,7 @@ private void click(By locator) {
                         "//li[contains(.,'" + title + "')]//a[contains(@href,'/items/')]"
                 );
 
-        click (titleLink);
+        click(titleLink);
 
         wait.until(
                 ExpectedConditions.urlContains("/items/")

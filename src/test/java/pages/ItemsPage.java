@@ -1,6 +1,10 @@
 package pages;
 
-import org.openqa.selenium.*;
+import base.BasePage;
+import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -9,10 +13,7 @@ import utils.ConfigReader;
 import java.time.Duration;
 import java.util.List;
 
-public class ItemsPage {
-
-    private final WebDriver driver;
-    private final WebDriverWait wait;
+public class ItemsPage extends BasePage {
 
     private static final int SHORT_TIMEOUT =
             ConfigReader.getIntProperty("short.timeout.seconds");
@@ -26,57 +27,11 @@ public class ItemsPage {
     private final By editButton = By.cssSelector(".edit-btn");
     private final By removeButton = By.cssSelector(".remove-btn");
     private final By rentsHeader = By.xpath("//h2[contains(text(),'Rents')]");
-    private final By loaderOverlay = By.cssSelector(".fog, .lds-ripple");
     private final By firstItemPurchaseDate = By.cssSelector(".items-list__item:first-child .items-list__item__purchase-date");
 
     public ItemsPage(WebDriver driver) {
 
-        this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(ConfigReader.getIntProperty("timeout.seconds")));
-    }
-
-    private void click(By locator) {
-
-        waitForLoaderToDisappear();
-
-        WebElement element = wait.until(
-                ExpectedConditions.elementToBeClickable(locator)
-        );
-
-        ((JavascriptExecutor) driver).executeScript(
-                "arguments[0].scrollIntoView({block: 'center'});",
-                element
-        );
-
-        waitForLoaderToDisappear();
-
-        try {
-
-            element.click();
-
-        } catch (ElementClickInterceptedException e) {
-
-            ((JavascriptExecutor) driver).executeScript(
-                    "arguments[0].click();",
-                    element
-            );
-        }
-
-        waitForLoaderToDisappear();
-    }
-
-    private void waitForLoaderToDisappear() {
-        try {
-
-            new WebDriverWait(
-                    driver,
-                    Duration.ofSeconds(SHORT_TIMEOUT)
-            ).until(
-                    ExpectedConditions.invisibilityOfElementLocated(loaderOverlay)
-            );
-
-        } catch (TimeoutException ignored) {
-        }
+        super(driver);
     }
 
     public void addItem() {
@@ -159,7 +114,7 @@ public class ItemsPage {
 
     public void clickShowHistoryForFirstItem() {
 
-       waitForLoaderToDisappear();
+        waitForLoaderToDisappear();
 
         click(showHistoryButton);
 
@@ -244,21 +199,21 @@ public class ItemsPage {
 
         waitForLoaderToDisappear();
 
-            WebElement item =
-                    driver.findElement(By.id(itemId));
+        WebElement item =
+                driver.findElement(By.id(itemId));
 
-            WebElement button =
-                    item.findElement(removeButton);
+        WebElement button =
+                item.findElement(removeButton);
 
-            System.out.println("Removing item id: " + itemId);
+        System.out.println("Removing item id: " + itemId);
 
-            wait.until(
-                    ExpectedConditions.elementToBeClickable(button)
-            ).click();
+        wait.until(
+                ExpectedConditions.elementToBeClickable(button)
+        ).click();
 
-            wait.until(
-                    ExpectedConditions.stalenessOf(item)
-            );
+        wait.until(
+                ExpectedConditions.stalenessOf(item)
+        );
     }
 
     public boolean isItemVisibleById(String itemId) {
@@ -268,5 +223,44 @@ public class ItemsPage {
         return driver.findElements(By.id(itemId))
                 .stream()
                 .anyMatch(WebElement::isDisplayed);
+    }
+
+    public void cklickShowHistoryById (String itemId) {
+
+        waitForLoaderToDisappear ();
+
+        WebElement item =
+                wait.until(
+                    ExpectedConditions.visibilityOfElementLocated(
+                            By.id(itemId)
+                    )
+                );
+
+        WebElement button =
+                item.findElement(showHistoryButton);
+
+        wait.until(
+                ExpectedConditions.elementToBeClickable(button)
+        ).click();
+
+        wait.until(
+                ExpectedConditions.urlContains("/rents/")
+        );
+    }
+
+    public String getItemStatusById (String itemId) {
+
+        waitForLoaderToDisappear();
+
+        WebElement item =
+                wait.until(
+                        ExpectedConditions.visibilityOfElementLocated(
+                                By.id(itemId)
+                        )
+                );
+
+        return item.findElement(
+                By.cssSelector(".items-list__item__status")
+        ).getText();
     }
 }

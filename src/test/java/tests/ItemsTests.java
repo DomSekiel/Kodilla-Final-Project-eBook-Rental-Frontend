@@ -7,6 +7,7 @@ import pages.ItemsPage;
 import pages.LoginPage;
 import pages.TitlesPage;
 import utils.ConfigReader;
+import utils.TestDataGenerator;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -26,7 +27,13 @@ public class ItemsTests extends BaseTest {
         TitlesPage titlesPage =
                 new TitlesPage(driver);
 
-        titlesPage.clickShowCopiesForFirstTitle();
+//        titlesPage.clickShowCopiesForFirstTitle();
+
+        String title = TestDataGenerator.generateTitle();
+
+        titlesPage.addTitle(title, TestDataGenerator.generateAuthor(), TestDataGenerator.getDefaultYear());
+
+        titlesPage.openItemsForTitle(title);
 
         assertThat(
                 titlesPage.isItemsPageDisplayed()
@@ -52,6 +59,8 @@ public class ItemsTests extends BaseTest {
         ItemsPage itemsPage =
                 new ItemsPage(driver);
 
+        itemsPage.addItem();
+
         String purchaseDateBefore =
                 itemsPage.getFirstItemPurchaseDate();
 
@@ -68,6 +77,8 @@ public class ItemsTests extends BaseTest {
     void shouldRemoveSelectedItem() {       // TC #17 Usunięcie egzemplarza
 
         ItemsPage itemsPage = new ItemsPage(driver);
+
+        itemsPage.addItem();
 
         int itemsCountBefore = itemsPage.getItemsCount();
 
@@ -91,6 +102,8 @@ public class ItemsTests extends BaseTest {
 
         ItemsPage itemsPage =
                 new ItemsPage(driver);
+
+        itemsPage.addItem();
 
         itemsPage.clickShowHistoryForFirstItem();
 

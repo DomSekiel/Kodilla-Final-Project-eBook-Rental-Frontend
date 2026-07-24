@@ -1,6 +1,7 @@
 package pages;
 
-import org.openqa.selenium.*;
+import base.BasePage;
+import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -9,10 +10,7 @@ import utils.ConfigReader;
 
 import java.time.Duration;
 
-public class LoginPage {
-
-    private final WebDriver driver;
-    private final WebDriverWait wait;
+public class LoginPage extends BasePage {
 
     private final By loginInput = By.id("login");
     private final By passwordInput = By.id("password");
@@ -20,63 +18,11 @@ public class LoginPage {
     private final By registerButton = By.id("register-btn");
     private final By errorMessage = By.className("alert__content");
     private final By repeatPasswordInput = By.id("password-repeat");
-    private final By loadingOverlay = By.cssSelector(".fog, .lds-ripple");
     private final By titlesHeader = By.xpath("//h2[contains(text(),'Titles catalog')]");
 
     public LoginPage(WebDriver driver) {
 
-        this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(ConfigReader.getIntProperty("timeout.seconds")));
-    }
-
-    private void click(By locator) {
-
-        waitForLoaderToDisappear();
-
-        WebElement element = wait.until(
-                ExpectedConditions.elementToBeClickable(locator)
-        );
-
-        ((JavascriptExecutor) driver).executeScript(
-                "arguments[0].scrollIntoView({block: 'center'});",
-                element
-        );
-
-        waitForLoaderToDisappear();
-
-        try {
-            element.click();
-        } catch (ElementClickInterceptedException e) {
-            ((JavascriptExecutor) driver).executeScript(
-                    "arguments[0].click();",
-                    element
-            );
-        }
-
-        waitForLoaderToDisappear();
-    }
-
-    private void type(By locator, String text) {
-
-        waitForLoaderToDisappear();
-
-        WebElement element = wait.until(
-                ExpectedConditions.visibilityOfElementLocated(locator)
-        );
-
-        element.clear();
-        element.sendKeys(text);
-    }
-
-    public void waitForLoaderToDisappear() {
-
-        try {
-
-            wait.until(
-                    ExpectedConditions.invisibilityOfElementLocated(loadingOverlay));
-
-        } catch (TimeoutException ignored) {
-        }
+        super(driver);
     }
 
     public void login(String login, String password) {

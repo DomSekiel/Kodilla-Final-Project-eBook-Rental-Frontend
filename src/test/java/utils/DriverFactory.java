@@ -15,9 +15,11 @@ public class DriverFactory {
 
         if (headless) {
 
-            options.addArguments("--headless=new");
+            options.addArguments("--headless");
             options.addArguments("--window-size=1920,1080");
+
         } else {
+
             options.addArguments("--start-maximized");
         }
 

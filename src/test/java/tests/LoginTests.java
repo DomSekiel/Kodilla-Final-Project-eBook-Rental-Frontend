@@ -48,10 +48,7 @@ public class LoginTests extends BaseTest {
     @Test
     void shouldNotLoginWithEmptyCredentials() { // TC #3 Logowanie puste pola
 
-        loginPage.login("","");
-                //ConfigReader.getProperty("empty.login"), // do wyjaśnienia z Mentorem
-                //ConfigReader.getProperty("empty.password") // do wyjaśnienia z Mentorem
-        //);
+        loginPage.login("", "");
 
         assertThat(loginPage.isTitlesPageDisplayed())
                 .isFalse();

@@ -3,8 +3,8 @@ package tests;
 import base.BaseTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import pages.LoginPage;
 import pages.ItemsPage;
+import pages.LoginPage;
 import pages.TitlesPage;
 import utils.ConfigReader;
 import utils.TestDataGenerator;
@@ -45,7 +45,7 @@ public class TitlesTests extends BaseTest {
         titlesPage.addTitle(
                 title,
                 TestDataGenerator.generateAuthor(),
-                TestDataGenerator.generateYear()
+                TestDataGenerator.getDefaultYear()
         );
 
         assertThat(
@@ -72,7 +72,7 @@ public class TitlesTests extends BaseTest {
         titlesPage.addTitle(
                 oldTitle,
                 TestDataGenerator.generateAuthor(),
-                TestDataGenerator.generateYear()
+                TestDataGenerator.getDefaultYear()
         );
 
         String newTitle =
@@ -97,7 +97,7 @@ public class TitlesTests extends BaseTest {
         titlesPage.addTitle(
                 title,
                 TestDataGenerator.generateAuthor(),
-                TestDataGenerator.generateYear()
+                TestDataGenerator.getDefaultYear()
         );
 
         titlesPage.removeTitle(title);
@@ -116,7 +116,7 @@ public class TitlesTests extends BaseTest {
         titlesPage.addTitle(
                 title,
                 TestDataGenerator.generateAuthor(),
-                TestDataGenerator.generateYear()
+                TestDataGenerator.getDefaultYear()
         );
 
         titlesPage.openItemsForTitle(title);
@@ -146,7 +146,7 @@ public class TitlesTests extends BaseTest {
         titlesPage.addTitle(
                 title,
                 TestDataGenerator.generateAuthor(),
-                TestDataGenerator.generateYear()
+                TestDataGenerator.getDefaultYear()
         );
 
         driver.navigate().refresh();
@@ -183,7 +183,7 @@ public class TitlesTests extends BaseTest {
         titlesPage.addTitle(
                 title,
                 TestDataGenerator.generateAuthor(),
-                TestDataGenerator.generateYear()
+                TestDataGenerator.getDefaultYear()
         );
 
         titlesPage.openItemsForTitle(title);

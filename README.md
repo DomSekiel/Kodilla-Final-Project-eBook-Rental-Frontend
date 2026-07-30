@@ -16,7 +16,15 @@ Projekt ma na celu automatyczną weryfikację najważniejszych funkcjonalności 
 
 ### Aplikacja
 
+![Aplikacja](screenshots/application.PNG)
 
+### Raport z testów
+
+![Raport z testów](screenshots/test-report.PNG)
+
+### GitHub Actions
+
+![GitHub Actions](screenshots/github-actions.PNG)
 
 ## Testowana aplikacja
 
@@ -242,3 +250,26 @@ Wymagane GitHub Secrets:
 - VALID_LOGIN
 - VALID_PASSWORD
 
+## Bezpieczeństwo
+
+Plik config.properties zawiera lokalne dane logowania i został dodany do gitignore.
+Do repozytorium dodawany jest wyłącznie plik config.properties.example
+
+## Praktyki zastosowane w porjekcie
+
+- Page Object Model
+- BasePage dla wspólnych metod
+- Explicit Waits
+- Synchronizacja z loaderem
+- JavaScriptExecutor jako mechanizm awaryjnego kliknięcia
+- Generowanie unikalnych danych testowych z wykorzystaniem UUID
+- Konfiguracja poza kodem źródłowym
+- GitHub Actions (CI)
+- Numeracja scenariuszy testowych zgodna z dokumentacją
+- Dokumentowanie błędów aplikacji za pomocą @Disabled
+
+## Autor
+
+Dominik Sękielewski
+
+Projekt końcowy kursu Kodilla QA Automation

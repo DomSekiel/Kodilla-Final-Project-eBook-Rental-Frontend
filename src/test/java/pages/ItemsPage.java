@@ -225,7 +225,7 @@ public class ItemsPage extends BasePage {
                 .anyMatch(WebElement::isDisplayed);
     }
 
-    public void cklickShowHistoryById (String itemId) {
+    public void clickShowHistoryById (String itemId) {
 
         waitForLoaderToDisappear ();
 

@@ -44,7 +44,7 @@ public class RentsTests extends BaseTest {
 
         itemId = itemsPage.getLastItemId();
 
-        itemsPage.cklickShowHistoryById(itemId);
+        itemsPage.clickShowHistoryById(itemId);
 
         rentsPage =
                 new RentsPage(driver);
@@ -78,7 +78,7 @@ public class RentsTests extends BaseTest {
     @Test
     void shouldEditRent() {     // TC #21 Edycja wypożyczenia
 
-        RentsPage rentsPage = new RentsPage(driver);
+        //RentsPage rentsPage = new RentsPage(driver);
 
         rentsPage.addRent("Brad Pitt with Jennifer");
 

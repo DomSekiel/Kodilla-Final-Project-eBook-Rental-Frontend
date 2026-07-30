@@ -33,14 +33,16 @@ public class TitlesPage extends BasePage {
                     driver,
                     Duration.ofSeconds(SHORT_TIMEOUT)
             ).until(
-                    ExpectedConditions.visibilityOfElementLocated(
+                    ExpectedConditions.refreshed(
+                        ExpectedConditions.visibilityOfElementLocated(
                             addNewButton
+                        )
                     )
             );
 
             return true;
 
-        } catch (TimeoutException e) {
+        } catch (TimeoutException | StaleElementReferenceException e) {
 
             return false;
         }

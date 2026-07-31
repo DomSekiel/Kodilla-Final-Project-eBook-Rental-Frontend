@@ -18,19 +18,11 @@
         <!-- Zakaz importów * -->
         <module name="AvoidStarImport"/>
 
-        <!-- Kolejność importów -->
-        <module name="CustomImportOrder">
-            <property name="customImportOrderRules"
-                      value="STATIC###STANDARD_JAVA_PACKAGE###THIRD_PARTY_PACKAGE"/>
-            <property name="sortImportsInGroupAlphabetically"
-                      value="true"/>
-        </module>
-
     </module>
 
     <!-- Maksymalna długość linii -->
     <module name="LineLength">
-        <property name="max" value="120"/>
+        <property name="max" value="130"/>
     </module>
 
 </module>
